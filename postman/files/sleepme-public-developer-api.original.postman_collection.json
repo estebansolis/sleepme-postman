@@ -1,0 +1,241 @@
+{
+	"info": {
+		"_postman_id": "4142850a-b899-4e06-aa32-1c62a934a3ff",
+		"name": "Sleepme Public Developer API",
+		"description": "Welcome to the SleepMe Public API Postman collection!",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10847419"
+	},
+	"item": [
+		{
+			"name": "Devices",
+			"item": [
+				{
+					"name": "List Devices",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SleepMeAPI_Token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{SleepMeAPI_Url}}/devices",
+							"host": [
+								"{{SleepMeAPI_Url}}"
+							],
+							"path": [
+								"devices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Sleep Reports",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SleepMeAPI_Token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{SleepMeAPI_URL}}/sleep-reports?start_date=2024-05-01&days_back=6&time_zone=America/New_York",
+							"host": [
+								"{{SleepMeAPI_URL}}"
+							],
+							"path": [
+								"sleep-reports"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2024-05-01"
+								},
+								{
+									"key": "days_back",
+									"value": "6"
+								},
+								{
+									"key": "time_zone",
+									"value": "America/New_York"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Device Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SleepMeAPI_Token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"set_temperature_f\": 69,\r\n    \"thermal_control_status\": \"standby\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SleepMeAPI_URL}}/devices/:device_id",
+							"host": [
+								"{{SleepMeAPI_URL}}"
+							],
+							"path": [
+								"devices",
+								":device_id"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "zx-cdkr641b4i5c70lhmjm0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Device Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SleepMeAPI_Token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SleepMeAPI_URL}}/devices/:device_id",
+							"host": [
+								"{{SleepMeAPI_URL}}"
+							],
+							"path": [
+								"devices",
+								":device_id"
+							],
+							"variable": [
+								{
+									"key": "device_id",
+									"value": "zx-cdkr641b4i5c70lhmjm0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{SleepMeAPI_Token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "SleepMeAPI_Url",
+			"value": "https://api.developer.sleep.me/v1",
+			"type": "string"
+		},
+		{
+			"key": "SleepMeAPI_Token",
+			"value": "{{your_token_here}}",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,8 @@
+.DS_Store
+.env
+.env.*
+*.private.*
+*.postman_environment.json
+*.postman_globals.json
+node_modules/
+run-reports/
