@@ -2,49 +2,49 @@ Sleepme CLI commands
 
 Run from the repository root. Set SleepMeAPI_Token and device_id in a private Postman environment and replace /path/to/private.environment.json below with its path.
 Edit temperature payloads in the saved requests to choose your temperature. Set time_zone, days_back, and optional start_date in the environment as needed.
-PATCH commands change the device. Run each desired request individually.
+PATCH commands change the device only when allowed_control_request matches the exact request name. Each PATCH command below opts in to that one recipe for this run; other controls remain skipped. A token and device_id are required.
 Rate limit: 10 requests/account/discrete minute; handle 429 with exponential backoff.
 
 References: https://docs.developer.sleep.me/api/ and https://docs.developer.sleep.me/docs/apiexamples/
 
 List Devices
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/List Devices" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "List Devices" -e /path/to/private.environment.json --no-report-events
 
 Get Device Status
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Get Device Status" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Get Device Status" -e /path/to/private.environment.json --no-report-events
 
 Update Device Status
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Update Device Status" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Update Device Status" --env-var "allowed_control_request=Update Device Status" -e /path/to/private.environment.json --no-report-events
 
 Turn Device On
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Turn Device On" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Turn Device On" --env-var "allowed_control_request=Turn Device On" -e /path/to/private.environment.json --no-report-events
 
 Turn Device Off
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Turn Device Off" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Turn Device Off" --env-var "allowed_control_request=Turn Device Off" -e /path/to/private.environment.json --no-report-events
 
 Set Temperature Fahrenheit
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Set Temperature Fahrenheit" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Set Temperature Fahrenheit" --env-var "allowed_control_request=Set Temperature Fahrenheit" -e /path/to/private.environment.json --no-report-events
 
 Set Temperature Celsius
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Set Temperature Celsius" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Set Temperature Celsius" --env-var "allowed_control_request=Set Temperature Celsius" -e /path/to/private.environment.json --no-report-events
 
 Set Maximum Cooling
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Set Maximum Cooling" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Set Maximum Cooling" --env-var "allowed_control_request=Set Maximum Cooling" -e /path/to/private.environment.json --no-report-events
 
 Set Maximum Heating
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Set Maximum Heating" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Set Maximum Heating" --env-var "allowed_control_request=Set Maximum Heating" -e /path/to/private.environment.json --no-report-events
 
 Display Fahrenheit
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Display Fahrenheit" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Display Fahrenheit" --env-var "allowed_control_request=Display Fahrenheit" -e /path/to/private.environment.json --no-report-events
 
 Display Celsius
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Display Celsius" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Display Celsius" --env-var "allowed_control_request=Display Celsius" -e /path/to/private.environment.json --no-report-events
 
 Set Device Time Zone
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Devices/Set Device Time Zone" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Set Device Time Zone" --env-var "allowed_control_request=Set Device Time Zone" -e /path/to/private.environment.json --no-report-events
 
 List Sleep Reports
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Sleep Reports/List Sleep Reports" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "List Sleep Reports" -e /path/to/private.environment.json --no-report-events
 
 Get Today Sleep Reports
-postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Sleep Reports/Get Today Sleep Reports" -e /path/to/private.environment.json --no-report-events
+postman collection run postman/files/sleepme-public-developer-api.postman_collection.json -i "Get Today Sleep Reports" -e /path/to/private.environment.json --no-report-events
