@@ -1,0 +1,12 @@
+{
+  "name": "sleepme-postman",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint:collection": "postman collection lint postman/collections/sleepme-public-developer-api --fail-severity warning",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  }
+}

@@ -1,0 +1,9 @@
+version: 1
+name: Sleepme contract tests
+slug: sleepme-contract-tests
+protocol: http
+port: 4500
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

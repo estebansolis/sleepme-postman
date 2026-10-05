@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "4142850a-b899-4e06-aa32-1c62a934a3ff",
     "name": "Sleepme Public Developer API",
-    "description": "All four operations in the Sleepme Public Developer API v1.1, plus individual PATCH recipes for every documented writable control property.\n\nSources: https://docs.developer.sleep.me/api/ and https://docs.developer.sleep.me/docs/apiexamples/. Reference checked 2026-10-05.\n\nSet SleepMeAPI_Token to your Sleepme developer token and device_id to an ID returned by List Devices. Requests inherit collection bearer authentication. SleepMeAPI_Url is the canonical base URL variable.\n\nRun individual requests using postman collection run <collection-path> -i \"Folder/Request Name\". See postman/files/sleepme-cli-commands.txt for every command. Use a private Postman environment to override the token and variables.\n\nPATCH requests change the selected device. Choose the specific recipe you want to execute. The documented limit is 10 requests per account per discrete minute; when making repeated calls, handle 429 responses with exponential backoff.\n\nSleep reports accept optional start_date (ISO8601 date, defaults to current date), days_back (0 through 6, defaults to 0), and time_zone (IANA name, defaults to UTC). The reference contains inconsistent interval wording; the collection uses the documented parameter defaults and bounds without rewriting that interval.",
+    "description": "All four operations in the Sleepme Public Developer API v1.1, plus individual PATCH recipes for every documented writable control property.\n\nSources: https://docs.developer.sleep.me/api/ and https://docs.developer.sleep.me/docs/apiexamples/. Reference checked 2026-10-05.\n\nSet SleepMeAPI_Token to your Sleepme developer token and device_id to an ID returned by List Devices. Requests inherit collection bearer authentication. SleepMeAPI_Url is the canonical base URL variable.\n\nRun individual requests using postman collection run <collection-path> -i \"Request Name\". See postman/files/sleepme-cli-commands.txt for every command. Use a private Postman environment to override the token and variables.\n\nPATCH requests are skipped by default. Set allowed_control_request to the exact request name to enable one recipe, and clear it after use. A nonblank SleepMeAPI_Token and device_id are also required. See docs/testing.md for smoke tests and assertions. The documented limit is 10 requests per account per discrete minute; when making repeated calls, handle 429 responses with exponential backoff.\n\nSleep reports accept optional start_date (ISO8601 date, defaults to current date), days_back (0 through 6, defaults to 0), and time_zone (IANA name, defaults to UTC). The reference contains inconsistent interval wording; the collection uses the documented parameter defaults and bounds without rewriting that interval.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "10847419"
   },
@@ -630,7 +630,107 @@
       }
     ]
   },
-  "event": [],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Opt in to one named recipe, never to all writes in a collection run.",
+          "if (!['GET', 'HEAD', 'OPTIONS'].includes(pm.request.method)) {",
+          "  const configured = (key) => {",
+          "    const value = pm.variables.get(key);",
+          "    return typeof value === 'string' && value.trim().length > 0 && !value.includes('{{');",
+          "  };",
+          "  if (pm.request.method !== 'PATCH' ||",
+          "      pm.variables.get('allowed_control_request') !== pm.info.requestName ||",
+          "      !configured('SleepMeAPI_Token') || !configured('device_id')) {",
+          "    console.warn('Skipped device control \"' + pm.info.requestName +",
+          "      '\": set allowed_control_request to this exact request name and supply SleepMeAPI_Token and device_id.');",
+          "    pm.execution.skipRequest();",
+          "  }",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('HTTP status is 200', () => pm.response.to.have.status(200));",
+          "pm.test('Content-Type is JSON', () => {",
+          "  pm.expect(pm.response.headers.get('Content-Type') || '').to.match(/^application\\/json(?:\\s*;|$)/i);",
+          "});",
+          "",
+          "let data;",
+          "let validJson = false;",
+          "pm.test('Response is valid JSON', () => {",
+          "  data = pm.response.json();",
+          "  validJson = true;",
+          "});",
+          "",
+          "if (validJson && pm.response.code === 200) {",
+          "  const object = (value) => {",
+          "    pm.expect(value).to.be.an('object');",
+          "    pm.expect(value).not.to.equal(null);",
+          "    pm.expect(Array.isArray(value)).to.equal(false);",
+          "  };",
+          "  const path = pm.request.url.getPath();",
+          "  if (pm.request.method === 'PATCH') {",
+          "    pm.test('Update response is an object', () => object(data));",
+          "  } else if (/\\/devices\\/?$/.test(path)) {",
+          "    pm.test('Device list contains valid device IDs', () => {",
+          "      pm.expect(data).to.be.an('array');",
+          "      data.forEach(device => {",
+          "        object(device);",
+          "        pm.expect(device.id).to.be.a('string');",
+          "        pm.expect(device.id.trim()).not.to.equal('');",
+          "        if (device.name !== undefined) pm.expect(device.name).to.be.a('string');",
+          "        if (device.attachments !== undefined) pm.expect(device.attachments).to.be.an('array');",
+          "      });",
+          "    });",
+          "  } else if (/\\/devices\\/[^/]+\\/?$/.test(path)) {",
+          "    pm.test('Device status has identity and status objects', () => {",
+          "      object(data);",
+          "      object(data.about);",
+          "      object(data.status);",
+          "      if (data.control !== undefined) object(data.control);",
+          "      for (const key of ['is_connected', 'is_water_low']) {",
+          "        if (data.status[key] !== undefined) pm.expect(data.status[key]).to.be.a('boolean');",
+          "      }",
+          "      for (const key of ['water_level', 'water_temperature_f', 'water_temperature_c']) {",
+          "        if (data.status[key] !== undefined) pm.expect(data.status[key]).to.be.a('number');",
+          "      }",
+          "    });",
+          "  } else if (/\\/sleep-reports\\/?$/.test(path)) {",
+          "    pm.test('Sleep reports contain dates and sessions', () => {",
+          "      object(data);",
+          "      pm.expect(data.reports).to.be.an('array');",
+          "      data.reports.forEach(report => {",
+          "        object(report);",
+          "        pm.expect(report.date).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+          "        pm.expect(report.sessions).to.be.an('array');",
+          "        report.sessions.forEach(session => {",
+          "          object(session);",
+          "          for (const key of ['awake_duration', 'rem_sleep_duration', 'light_sleep_duration',",
+          "            'deep_sleep_duration', 'total_sleep_duration', 'in_bed_duration',",
+          "            'total_session_duration', 'sleep_latency']) {",
+          "            const value = session[key];",
+          "            if (value !== undefined && value !== null) {",
+          "              pm.expect(Number.isInteger(value), key + ' must be an integer').to.equal(true);",
+          "              pm.expect(value, key).to.be.at.least(0);",
+          "            }",
+          "          }",
+          "        });",
+          "      });",
+          "    });",
+          "  }",
+          "}"
+        ]
+      }
+    }
+  ],
   "variable": [
     {
       "key": "SleepMeAPI_Url",
@@ -667,6 +767,12 @@
       "value": "UTC",
       "type": "string",
       "description": "IANA time zone name, for example America/Los_Angeles."
+    },
+    {
+      "key": "allowed_control_request",
+      "value": "",
+      "type": "string",
+      "description": "Exact name of the one PATCH recipe allowed to run. Blank skips all controls. Clear after use."
     }
   ]
 }
